@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.6
 
 import socket, sys, os
 import szasar
@@ -71,7 +71,7 @@ if __name__ == "__main__":
 		SERVER = int( sys.argv[2])
 
 	s = socket.socket( socket.AF_INET, socket.SOCK_STREAM )
-	s.connect( (SERVER, PORT) )
+	s.connect((SERVER, PORT))
 
 	while True:
 		#user = input( "Introduce el nombre de usuario: " )

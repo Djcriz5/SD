@@ -3,7 +3,10 @@
 import socket, sys, os, signal
 import szasar
 
+SERVER_ADD = "localhost"
 PORT = 6012
+PORT1 = 6013
+PORT2 = 6014
 FILES_PATH = "files"
 MAX_FILE_SIZE = 10 * 1 << 20 # 10 MiB
 SPACE_MARGIN = 50 * 1 << 20  # 50 MiB
@@ -21,9 +24,13 @@ def sendER( s, code=1 ):
 
 def session( s ):
 	state = State.Identification
+	print(s, "\n\n", state)
 
 	while True:
-		message = szasar.recvline( dialog ).decode( "ascii" )
+		message = szasar.recvline(dialog)
+		sock_r1.sendall(message)
+		sock_r2.sendall(message)
+		message=message.decode( "ascii" )
 		if not message:
 			return
 
@@ -46,7 +53,7 @@ def session( s ):
 			if( user == 0 or PASSWORDS[user] == message[4:] ):
 				sendOK( s )
 				state = State.Main
-                
+
 			else:
 				sendER( s, 3 )
 				state = State.Identification
@@ -153,10 +160,14 @@ def session( s ):
 if __name__ == "__main__":
 	s = socket.socket( socket.AF_INET, socket.SOCK_STREAM )
 
-	s.bind( ('', PORT) )
+	s.bind(('', PORT))
 	s.listen( 5 )
 
 	signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+	sock_r1=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+	sock_r2=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+	sock_r1.connect((SERVER_ADD, PORT1))
+	sock_r2.connect((SERVER_ADD, PORT2))
 
 	while True:
 		dialog, address = s.accept()
